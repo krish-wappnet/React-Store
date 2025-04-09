@@ -1,7 +1,14 @@
 import { useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import jsPDF from "jspdf";
 import toast from "react-hot-toast";
+import { 
+  FaPlus, 
+  FaFileCsv, 
+  FaFilePdf, 
+  FaUpload, 
+  FaMagic 
+} from "react-icons/fa"
 
 interface Product {
   id: string;
@@ -80,16 +87,18 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
       const description = response.data[0].generated_text.trim();
       setProduct({ ...product, description });
       toast.success("Description generated successfully!");
-    } catch (error: any) {
-      if (error.response?.status === 429) {
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError;
+    
+      if (axiosError.response?.status === 429) {
         toast.error("Rate limit exceeded. Please wait and try again.");
-      } else if (error.response?.status === 503) {
+      } else if (axiosError.response?.status === 503) {
         toast.error("Model is loading. Please try again in a few seconds.");
       } else {
         toast.error("Failed to generate description. Please try again later.");
       }
-      console.error("Hugging Face API error:", error.response?.data || error.message);
-    } finally {
+      console.error("Hugging Face API error:", axiosError.response?.data || axiosError.message);
+    }finally {
       setIsGenerating(false);
     }
   };
@@ -100,10 +109,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
       const products: Product[] = response.data;
       const headers = ["ID,Name,Category,Price,Stock,Description,URL,UpdatedAt"];
       const rows = products.map((p) =>
-        `${p.id},${p.name},${p.category},${p.price},${p.stock},${p.description},${p.url || ""},${p.updatedAt || ""}`.replace(
-          /,/g,
-          " "
-        )
+        `"${p.id}","${p.name}","${p.category}","${p.price}","${p.stock}","${p.description.replace(/"/g, '""')}","${p.url || ""}","${p.updatedAt || ""}"`
       );
       const csvContent = [...headers, ...rows].join("\n");
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -264,7 +270,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
               disabled={isGenerating}
               className={`flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-200 disabled:bg-indigo-400 disabled:cursor-not-allowed`}
             >
-              {isGenerating && (
+              {isGenerating ? (
                 <svg
                   className="animate-spin h-5 w-5 mr-2 text-white"
                   xmlns="http://www.w3.org/2000/svg"
@@ -285,6 +291,8 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
                     d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8v-8H4z"
                   />
                 </svg>
+              ) : (
+                <FaMagic className="mr-2" />
               )}
               {isGenerating ? "Generating..." : "Generate Description"}
             </button>
@@ -313,8 +321,9 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
 
       <button
         type="submit"
-        className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-all duration-200 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-all duration-200 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex items-center justify-center"
       >
+        <FaPlus className="mr-2" />
         Add Product
       </button>
     </form>
@@ -322,17 +331,20 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
     <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
       <button
         onClick={exportToCSV}
-        className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-all duration-200"
+        className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-all duration-200 flex items-center justify-center"
       >
+        <FaFileCsv className="mr-2" />
         Export to CSV
       </button>
       <button
         onClick={exportToPDF}
-        className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200"
+        className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 flex items-center justify-center"
       >
+        <FaFilePdf className="mr-2" />
         Export to PDF
       </button>
-      <label className="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-all duration-200 cursor-pointer text-center">
+      <label className="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-all duration-200 cursor-pointer text-center flex items-center justify-center">
+        <FaUpload className="mr-2" />
         Bulk Upload CSV
         <input
           type="file"

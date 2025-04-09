@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { JSX } from "react";
 
 const PrivateRoute: React.FC<{ role: string; children: JSX.Element }> = ({ role, children }) => {
