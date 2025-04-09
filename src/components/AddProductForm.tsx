@@ -105,7 +105,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
 
   const exportToCSV = async () => {
     try {
-      const response = await axios.get("/api/products");
+      const response = await axios.get("https://react-store-2wpq.onrender.com/products");
       const products: Product[] = response.data;
       const headers = ["ID,Name,Category,Price,Stock,Description,URL,UpdatedAt"];
       const rows = products.map((p) =>
@@ -126,7 +126,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
 
   const exportToPDF = async () => {
     try {
-      const response = await axios.get("/api/products");
+      const response = await axios.get("https://react-store-2wpq.onrender.com/products");
       const products: Product[] = response.data;
       const doc = new jsPDF();
       doc.setFontSize(16);
@@ -179,7 +179,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
       let successCount = 0;
       for (const product of newProducts) {
         try {
-          await axios.post("/api/products", product);
+          await axios.post("https://react-store-2wpq.onrender.com/products", product);
           onAdd({
             name: product.name,
             category: product.category,

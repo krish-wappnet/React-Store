@@ -28,7 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user]);
 
   const login = async (username: string, password: string) => {
-    const response = await fetch("/api/users");
+    const response = await fetch("https://react-store-2wpq.onrender.com/users");
     const users: (User & { password: string })[] = await response.json();
 
     const foundUser = users.find(

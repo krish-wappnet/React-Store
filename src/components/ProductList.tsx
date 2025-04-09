@@ -29,7 +29,7 @@ const ProductList = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("/api/products");
+      const response = await axios.get("https://react-store-2wpq.onrender.com/products");
       const fetchedProducts: Product[] = response.data;
       console.log("Fetched response:", response.data);
       setProducts(fetchedProducts);
@@ -52,7 +52,7 @@ const ProductList = () => {
       return;
     }
     try {
-      const response = await axios.post("/api/products", product);
+      const response = await axios.post("https://react-store-2wpq.onrender.com/products", product);
       setProducts([...products, response.data]);
       toast.success(`Product "${product.name}" added successfully!`);
       setIsAddFormOpen(false); // Close form after adding
@@ -75,7 +75,7 @@ const ProductList = () => {
     }
     try {
       const response = await axios.put(
-        `/api/products/${updatedProduct.id}`,
+        `https://react-store-2wpq.onrender.com/products/${updatedProduct.id}`,
         updatedProduct
       );
       setProducts(products.map((p) => (p.id === updatedProduct.id ? response.data : p)));
@@ -95,7 +95,7 @@ const ProductList = () => {
   const deleteProduct = async (id: string) => {
     try {
       const productToDelete = products.find((p) => p.id === id);
-      await axios.delete(`/api/products/${id}`);
+      await axios.delete(`https://react-store-2wpq.onrender.com/products/${id}`);
       setProducts(products.filter((p) => p.id !== id));
       toast.success(`Product "${productToDelete?.name}" deleted successfully!`);
     } catch (error) {

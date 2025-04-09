@@ -25,7 +25,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("/api/products");
+        const response = await axios.get("https://react-store-2wpq.onrender.com/products");
         // Mock updatedAt if not present in your data
         const fetchedProducts = response.data.map((p: Product) => ({
           ...p,
