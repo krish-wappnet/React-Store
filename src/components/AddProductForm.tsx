@@ -196,148 +196,153 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
   };
 
   return (
-    <div className="mb-8 bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Manage Products</h2>
-      <form onSubmit={handleSubmit} className="space-y-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
-            <input
-              type="text"
-              value={product.name}
-              onChange={(e) => setProduct({ ...product, name: e.target.value })}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              placeholder="Enter product name"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
-            <select
-              value={product.category}
-              onChange={(e) => setProduct({ ...product, category: e.target.value })}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              required
-            >
-              <option value="">Select Category</option>
-              <option value="Electronics">Electronics</option>
-              <option value="Clothing">Clothing</option>
-              <option value="Books">Books</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Price (₹)</label>
-            <input
-              type="number"
-              value={product.price || ""}
-              onChange={(e) => setProduct({ ...product, price: Number(e.target.value) })}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              min="0"
-              step="0.01"
-              placeholder="Enter price"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Stock</label>
-            <input
-              type="number"
-              value={product.stock || ""}
-              onChange={(e) => setProduct({ ...product, stock: Number(e.target.value) })}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              min="0"
-              placeholder="Enter stock"
-              required
-            />
-          </div>
-          <div className="md:col-span-2 relative">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-            <div className="flex gap-4">
-              <textarea
-                value={product.description}
-                onChange={(e) => setProduct({ ...product, description: e.target.value })}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                rows={4}
-                placeholder="Enter product description or generate one"
-                disabled={isGenerating}
-              />
-              <button
-                type="button"
-                onClick={generateDescription}
-                disabled={isGenerating}
-                className={`px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 hover:scale-105 transition-all duration-200 flex items-center justify-center ${
-                  isGenerating ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                {isGenerating ? (
-                  <svg
-                    className="animate-spin h-5 w-5 mr-2 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8v-8H4z"
-                    ></path>
-                  </svg>
-                ) : null}
-                {isGenerating ? "Generating..." : "Generate"}
-              </button>
-            </div>
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Product URL (optional)</label>
-            <input
-              type="url"
-              value={product.url || ""}
-              onChange={(e) => setProduct({ ...product, url: e.target.value })}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              placeholder="https://example.com/product"
-            />
-          </div>
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          Add Product
-        </button>
-      </form>
-
-      <div className="flex flex-col sm:flex-row gap-4">
-        <button
-          onClick={exportToCSV}
-          className="w-full sm:w-auto bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 hover:scale-105 transition-all duration-200"
-        >
-          Export to CSV
-        </button>
-        <button
-          onClick={exportToPDF}
-          className="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition-all duration-200"
-        >
-          Export to PDF
-        </button>
-        <label className="w-full sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 hover:scale-105 transition-all duration-200 cursor-pointer text-center">
-          Bulk Upload CSV
+    <div className="mb-8 bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 max-w-4xl mx-auto">
+    <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Add New Product</h2>
+    
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-gray-700">Product Name *</label>
           <input
-            type="file"
-            accept=".csv"
-            className="hidden"
-            onChange={handleBulkUpload}
+            type="text"
+            value={product.name}
+            onChange={(e) => setProduct({ ...product, name: e.target.value })}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+            placeholder="Enter product name"
+            required
           />
-        </label>
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-gray-700">Category *</label>
+          <select
+            value={product.category}
+            onChange={(e) => setProduct({ ...product, category: e.target.value })}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white"
+            required
+          >
+            <option value="">Select Category</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Clothing">Clothing</option>
+            <option value="Books">Books</option>
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-gray-700">Price (₹) *</label>
+          <input
+            type="number"
+            value={product.price || ""}
+            onChange={(e) => setProduct({ ...product, price: Number(e.target.value) })}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+            min="0"
+            step="0.01"
+            placeholder="Enter price"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-gray-700">Stock *</label>
+          <input
+            type="number"
+            value={product.stock || ""}
+            onChange={(e) => setProduct({ ...product, stock: Number(e.target.value) })}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+            min="0"
+            placeholder="Enter stock quantity"
+            required
+          />
+        </div>
+
+        <div className="md:col-span-2 space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="block text-sm font-semibold text-gray-700">Description</label>
+            <button
+              type="button"
+              onClick={generateDescription}
+              disabled={isGenerating}
+              className={`flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-200 disabled:bg-indigo-400 disabled:cursor-not-allowed`}
+            >
+              {isGenerating && (
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8v-8H4z"
+                  />
+                </svg>
+              )}
+              {isGenerating ? "Generating..." : "Generate Description"}
+            </button>
+          </div>
+          <textarea
+            value={product.description}
+            onChange={(e) => setProduct({ ...product, description: e.target.value })}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 disabled:bg-gray-100"
+            rows={4}
+            placeholder="Enter product description or generate one"
+            disabled={isGenerating}
+          />
+        </div>
+
+        <div className="md:col-span-2 space-y-2">
+          <label className="block text-sm font-semibold text-gray-700">Product URL (optional)</label>
+          <input
+            type="url"
+            value={product.url || ""}
+            onChange={(e) => setProduct({ ...product, url: e.target.value })}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+            placeholder="https://example.com/product"
+          />
+        </div>
       </div>
+
+      <button
+        type="submit"
+        className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-all duration-200 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      >
+        Add Product
+      </button>
+    </form>
+
+    <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
+      <button
+        onClick={exportToCSV}
+        className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-all duration-200"
+      >
+        Export to CSV
+      </button>
+      <button
+        onClick={exportToPDF}
+        className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200"
+      >
+        Export to PDF
+      </button>
+      <label className="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-all duration-200 cursor-pointer text-center">
+        Bulk Upload CSV
+        <input
+          type="file"
+          accept=".csv"
+          className="hidden"
+          onChange={handleBulkUpload}
+        />
+      </label>
     </div>
+  </div>
   );
 };
 
