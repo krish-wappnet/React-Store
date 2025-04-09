@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import jsPDF from "jspdf";
-import toast from "react-hot-toast"; // Add react-hot-toast for notifications
+import toast from "react-hot-toast";
 
 interface Product {
   id: string;
@@ -11,6 +11,7 @@ interface Product {
   stock: number;
   description: string;
   url?: string;
+  updatedAt?: string; // Added for AdminDashboard compatibility
 }
 
 interface AddProductFormProps {
@@ -26,26 +27,83 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
     description: "",
     url: "",
   });
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const HUGGINGFACE_API_KEY = import.meta.env.VITE_API_KEY; // Vite env variable
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!product.name || !product.category || product.price <= 0 || product.stock < 0) {
-      toast.error("Please fill all required fields correctly!");
+      toast.error("Please fill all required fields with valid values!");
       return;
     }
-    onAdd(product);
+    const newProduct = { ...product, updatedAt: new Date().toISOString() };
+    onAdd(newProduct);
     setProduct({ name: "", category: "", price: 0, stock: 0, description: "", url: "" });
-    toast.success("Product added successfully!"); // Success toast
+    toast.success("Product added successfully!");
   };
 
-  // Export to CSV
+  const generateDescription = async () => {
+    if (!product.name || !product.category) {
+      toast.error("Please enter a product name and category first!");
+      return;
+    }
+
+    if (!HUGGINGFACE_API_KEY) {
+      toast.error("Hugging Face API key is missing. Please configure VITE_API_KEY in .env!");
+      console.error("Missing VITE_API_KEY in .env");
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const response = await axios.post(
+        "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1", // Using GPT-2; swap to a better model if needed
+        {
+          inputs: `Create a concise product description (50-70 words) for a ${product.category} product named "${product.name}". Highlight key features and appeal: `,
+          parameters: {
+            max_length: 120, // Slightly higher to ensure full output
+            temperature: 0.7,
+            top_k: 50,
+            top_p: 0.95,
+            return_full_text: false, // Only get the generated part
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${HUGGINGFACE_API_KEY}`,
+          },
+        }
+      );
+
+      const description = response.data[0].generated_text.trim();
+      setProduct({ ...product, description });
+      toast.success("Description generated successfully!");
+    } catch (error: any) {
+      if (error.response?.status === 429) {
+        toast.error("Rate limit exceeded. Please wait and try again.");
+      } else if (error.response?.status === 503) {
+        toast.error("Model is loading. Please try again in a few seconds.");
+      } else {
+        toast.error("Failed to generate description. Please try again later.");
+      }
+      console.error("Hugging Face API error:", error.response?.data || error.message);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const exportToCSV = async () => {
     try {
       const response = await axios.get("http://localhost:3001/products");
       const products: Product[] = response.data;
-      const headers = ["ID,Name,Category,Price,Stock,Description,URL"];
+      const headers = ["ID,Name,Category,Price,Stock,Description,URL,UpdatedAt"];
       const rows = products.map((p) =>
-        `${p.id},${p.name},${p.category},${p.price},${p.stock},${p.description},${p.url || ""}`.replace(/,/g, " ")
+        `${p.id},${p.name},${p.category},${p.price},${p.stock},${p.description},${p.url || ""},${p.updatedAt || ""}`.replace(
+          /,/g,
+          " "
+        )
       );
       const csvContent = [...headers, ...rows].join("\n");
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -60,7 +118,6 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
     }
   };
 
-  // Export to PDF
   const exportToPDF = async () => {
     try {
       const response = await axios.get("http://localhost:3001/products");
@@ -71,8 +128,8 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
       doc.setFontSize(12);
       let y = 30;
       products.forEach((p) => {
-        const text = `${p.id} | ${p.name} | ${p.category} | ₹${p.price.toFixed(2)} | Stock: ${p.stock} | ${p.description} | ${p.url || "No URL"}`;
-        doc.text(text, 20, y, { maxWidth: 170 }); // Wrap text if too long
+        const text = `${p.id} | ${p.name} | ${p.category} | ₹${p.price.toFixed(2)} | Stock: ${p.stock} | ${p.description} | ${p.url || "No URL"} | Updated: ${p.updatedAt || "N/A"}`;
+        doc.text(text, 20, y, { maxWidth: 170 });
         y += 10;
         if (y > 270) {
           doc.addPage();
@@ -87,7 +144,6 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
     }
   };
 
-  // Bulk Upload via CSV
   const handleBulkUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -95,10 +151,10 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
     const reader = new FileReader();
     reader.onload = async (event) => {
       const text = event.target?.result as string;
-      const lines = text.split("\n").slice(1); // Skip header
+      const lines = text.split("\n").slice(1);
       const newProducts = lines
         .map((line) => {
-          const [id, name, category, price, stock, description, url] = line.split(",");
+          const [id, name, category, price, stock, description, url, updatedAt] = line.split(",");
           if (!id || !name || !category || !price || !stock) return null;
           return {
             id,
@@ -108,6 +164,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
             stock: Number(stock),
             description: description || "",
             url: url || undefined,
+            updatedAt: updatedAt || new Date().toISOString(),
           } as Product;
         })
         .filter((p) => p !== null) as Product[];
@@ -123,6 +180,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
             stock: product.stock,
             description: product.description,
             url: product.url,
+            updatedAt: product.updatedAt,
           });
           successCount++;
         } catch (error) {
@@ -168,10 +226,10 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Price</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Price (₹)</label>
             <input
               type="number"
-              value={product.price}
+              value={product.price || ""}
               onChange={(e) => setProduct({ ...product, price: Number(e.target.value) })}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
               min="0"
@@ -184,7 +242,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
             <label className="block text-sm font-semibold text-gray-700 mb-2">Stock</label>
             <input
               type="number"
-              value={product.stock}
+              value={product.stock || ""}
               onChange={(e) => setProduct({ ...product, stock: Number(e.target.value) })}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
               min="0"
@@ -192,15 +250,50 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
               required
             />
           </div>
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 relative">
             <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-            <textarea
-              value={product.description}
-              onChange={(e) => setProduct({ ...product, description: e.target.value })}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              rows={4}
-              placeholder="Enter product description"
-            />
+            <div className="flex gap-4">
+              <textarea
+                value={product.description}
+                onChange={(e) => setProduct({ ...product, description: e.target.value })}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                rows={4}
+                placeholder="Enter product description or generate one"
+                disabled={isGenerating}
+              />
+              <button
+                type="button"
+                onClick={generateDescription}
+                disabled={isGenerating}
+                className={`px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 hover:scale-105 transition-all duration-200 flex items-center justify-center ${
+                  isGenerating ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                {isGenerating ? (
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8v-8H4z"
+                    ></path>
+                  </svg>
+                ) : null}
+                {isGenerating ? "Generating..." : "Generate"}
+              </button>
+            </div>
           </div>
           <div className="md:col-span-2">
             <label className="block text-sm font-semibold text-gray-700 mb-2">Product URL (optional)</label>
