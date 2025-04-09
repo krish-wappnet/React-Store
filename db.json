@@ -34,7 +34,16 @@
       "price": 500,
       "stock": 10,
       "description": "THis is the product",
-      "url": ""
+      "url": "https://imgs.search.brave.com/G0QMXu6i3K8FC5ITPPT7vcfnFj0lom_JpQoS2I7tBhQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLmV0/c3lzdGF0aWMuY29t/LzI0OTU2NzAzL2Mv/NTA0LzUwNC82Ni8z/NTUvaWwvNDhmMDM2/LzMwMzg4OTI0Nzcv/aWxfNjAweDYwMC4z/MDM4ODkyNDc3X3Rq/NHIuanBn"
+    },
+    {
+      "id": "983e",
+      "name": "A Game of throne",
+      "category": "Books",
+      "price": 1550,
+      "stock": 6,
+      "description": "A complete Game of throne premium edition book",
+      "url": "https://imgs.search.brave.com/Gx0ovYoP7i6BEBdaPyQCJxQ3pJUMqNZ4oo9ahyySRTU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMtbmEuc3NsLWlt/YWdlcy1hbWF6b24u/Y29tL2ltYWdlcy9J/LzgxLUhIMnFYVktM/LmpwZw"
     }
   ],
   "users": [
@@ -49,6 +58,12 @@
       "username": "user",
       "role": "user",
       "password": "user123"
+    },
+    {
+      "id": "3",
+      "username": "test",
+      "role": "user",
+      "password": "123456"
     }
   ]
 }

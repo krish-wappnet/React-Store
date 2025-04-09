@@ -1,21 +1,27 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Login = () => {
-  const { login } = useAuth();
+  const { login, user } = useAuth(); // Get user from context
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await login(username, password);
-      navigate("/"); // Redirect to home after login
-    } catch {
-      setError("Invalid credentials");
+      toast.success(`Logged in as ${username}!`);
+      // Redirect based on role after successful login
+      if (user?.role === "admin") {
+        navigate("/admin"); // Admins see ProductList with AddProductForm
+      } else {
+        navigate("/"); // Users see ProductList without AddProductForm
+      }
+    } catch (error) {
+      toast.error("Invalid credentials");
     }
   };
 
@@ -25,11 +31,6 @@ const Login = () => {
         <h2 className="text-3xl font-extrabold text-gray-800 mb-6 text-center">
           Welcome Back
         </h2>
-        {error && (
-          <p className="text-red-600 bg-red-100 p-3 rounded-lg mb-6 text-center font-medium animate-pulse">
-            {error}
-          </p>
-        )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">

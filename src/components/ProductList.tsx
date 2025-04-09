@@ -21,22 +21,28 @@ const ProductList = () => {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false); // Toggle for AddProductForm
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
   const fetchProducts = async () => {
-    const response = await axios.get("http://localhost:3001/products");
-    const fetchedProducts: Product[] = response.data;
-    setProducts(fetchedProducts);
-    fetchedProducts.forEach((product) => {
-      if (product.stock < 10) {
-        toast.error(`Low stock alert: ${product.name} has only ${product.stock} units left!`, {
-          id: `low-stock-${product.id}`,
-        });
-      }
-    });
+    try {
+      const response = await axios.get("http://localhost:3001/products");
+      const fetchedProducts: Product[] = response.data;
+      setProducts(fetchedProducts);
+      fetchedProducts.forEach((product) => {
+        if (product.stock < 10) {
+          toast.error(`Low stock alert: ${product.name} has only ${product.stock} units left!`, {
+            id: `low-stock-${product.id}`,
+          });
+        }
+      });
+    } catch (error) {
+      toast.error("Failed to fetch products!");
+      console.error("Fetch products error:", error);
+    }
   };
 
   const addProduct = async (product: Omit<Product, "id">) => {
@@ -48,6 +54,7 @@ const ProductList = () => {
       const response = await axios.post("http://localhost:3001/products", product);
       setProducts([...products, response.data]);
       toast.success(`Product "${product.name}" added successfully!`);
+      setIsAddFormOpen(false); // Close form after adding
     } catch (error) {
       toast.error("Failed to add product!");
       console.error("Add product error:", error);
@@ -115,38 +122,65 @@ const ProductList = () => {
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {user?.role === "admin" && <AddProductForm onAdd={addProduct} />}
-        
+        {/* Header */}
+        <div className="mb-8 flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-800">Product Management</h1>
+          {user?.role === "admin" && (
+            <button
+              onClick={() => setIsAddFormOpen(!isAddFormOpen)}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition-all duration-200"
+            >
+              {isAddFormOpen ? "Close Form" : "Add New Product"}
+            </button>
+          )}
+        </div>
+
+        {/* Add Product Form (Collapsible) */}
+        {user?.role === "admin" && isAddFormOpen && (
+          <div className="mb-8">
+            <AddProductForm onAdd={addProduct} />
+          </div>
+        )}
+
         {/* Filters */}
         <div className="mb-8 bg-white p-6 rounded-xl shadow-md flex flex-col sm:flex-row gap-4">
-          <input
-            type="text"
-            placeholder="Search products..."
-            className="w-full sm:w-1/3 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <select
-            className="w-full sm:w-1/3 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-          >
-            <option value="">All Categories</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Books">Books</option>
-          </select>
-          <select
-            className="w-full sm:w-1/3 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-          >
-            <option value="">Sort By</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="name-asc">Name: A-Z</option>
-            <option value="name-desc">Name: Z-A</option>
-          </select>
+          <div className="flex-1">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Search</label>
+            <input
+              type="text"
+              placeholder="Search products..."
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+            <select
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              <option value="">All Categories</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Clothing">Clothing</option>
+              <option value="Books">Books</option>
+            </select>
+          </div>
+          <div className="flex-1">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Sort By</label>
+            <select
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="">Default</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="name-asc">Name: A-Z</option>
+              <option value="name-desc">Name: Z-A</option>
+            </select>
+          </div>
         </div>
 
         {/* Edit Modal */}
@@ -155,7 +189,7 @@ const ProductList = () => {
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50"
             onClick={(e) => { if (e.target === e.currentTarget) setEditingProduct(null); }}
           >
-            <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg transform transition-all duration-300 scale-95 animate-in">
+            <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg transform transition-all duration-300 scale-95">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">Edit Product</h2>
               <form onSubmit={handleEditSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -246,62 +280,71 @@ const ProductList = () => {
           </div>
         )}
 
-        {/* Product Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transform transition-all duration-300 hover:scale-105"
-            >
-              {product.url ? (
-                <img
-                  src={product.url}
-                  alt={product.name}
-                  className="w-full h-48 object-cover"
-                  onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/200x300?text=No+Image"; }}
-                />
-              ) : (
-                <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-500 font-medium">No Image</span>
-                </div>
-              )}
-              <div className="p-5">
-                <h3 className="text-xl font-bold text-gray-800 truncate">{product.name}</h3>
-                <p className="text-sm text-gray-600 mt-1">{product.category}</p>
-                <p className="text-lg font-semibold text-green-600 mt-2">₹{product.price.toFixed(2)}</p>
-                <p className="text-sm text-gray-700 mt-1">Stock: {product.stock}</p>
-                <p className="text-sm text-gray-500 mt-2 line-clamp-2">{product.description}</p>
-                {product.url && (
-                  <p className="mt-3">
-                    <a
-                      href={product.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline font-medium"
-                    >
-                      View Product
-                    </a>
-                  </p>
-                )}
-                {user?.role === "admin" && (
-                  <div className="mt-4 flex gap-3">
-                    <button
-                      className="flex-1 bg-yellow-500 text-white py-2 rounded-lg font-semibold hover:bg-yellow-600 hover:scale-105 transition-all duration-200"
-                      onClick={() => setEditingProduct(product)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="flex-1 bg-red-500 text-white py-2 rounded-lg font-semibold hover:bg-red-600 hover:scale-105 transition-all duration-200"
-                      onClick={() => deleteProduct(product.id)}
-                    >
-                      Delete
-                    </button>
+        {/* Product List */}
+        <div className="bg-white p-6 rounded-xl shadow-md">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Product Inventory</h2>
+          {filteredProducts.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">No products found.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="bg-gray-50 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 hover:scale-102"
+                >
+                  {product.url ? (
+                    <img
+                      src={product.url}
+                      alt={product.name}
+                      className="w-full h-48 object-cover"
+                      onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/200x300?text=No+Image"; }}
+                    />
+                  ) : (
+                    <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+                      <span className="text-gray-500 font-medium">No Image</span>
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <h3 className="text-lg font-semibold text-gray-800 truncate">{product.name}</h3>
+                    <p className="text-sm text-gray-600 mt-1">{product.category}</p>
+                    <p className="text-lg font-semibold text-green-600 mt-2">₹{product.price.toFixed(2)}</p>
+                    <p className={`text-sm mt-1 ${product.stock < 10 ? "text-red-600 font-semibold" : "text-gray-700"}`}>
+                      Stock: {product.stock}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2 line-clamp-2">{product.description}</p>
+                    {product.url && (
+                      <p className="mt-3">
+                        <a
+                          href={product.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline font-medium"
+                        >
+                          View Product
+                        </a>
+                      </p>
+                    )}
+                    {user?.role === "admin" && (
+                      <div className="mt-4 flex gap-3">
+                        <button
+                          className="flex-1 bg-yellow-600 text-white py-2 rounded-lg font-semibold hover:bg-yellow-700 hover:scale-105 transition-all duration-200"
+                          onClick={() => setEditingProduct(product)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="flex-1 bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-600/90 hover:scale-105 transition-all duration-200"
+                          onClick={() => deleteProduct(product.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

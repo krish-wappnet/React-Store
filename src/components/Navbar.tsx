@@ -20,7 +20,7 @@ const Navbar = () => {
           to="/"
           className="text-2xl font-extrabold tracking-tight hover:text-blue-200 transition-colors duration-200"
         >
-          My Store
+          Store
         </Link>
 
         {/* Hamburger Menu Button (Mobile) */}
