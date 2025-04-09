@@ -44,6 +44,16 @@
       "stock": 10,
       "description": "A complete Game of throne premium edition book",
       "url": "https://imgs.search.brave.com/Gx0ovYoP7i6BEBdaPyQCJxQ3pJUMqNZ4oo9ahyySRTU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMtbmEuc3NsLWlt/YWdlcy1hbWF6b24u/Y29tL2ltYWdlcy9J/LzgxLUhIMnFYVktM/LmpwZw"
+    },
+    {
+      "id": "5a49",
+      "name": "Asus Tuf f15",
+      "category": "Electronics",
+      "price": 80000,
+      "stock": 19,
+      "description": "This is the laptop",
+      "url": "",
+      "updatedAt": "2025-04-09T10:12:44.093Z"
     }
   ],
   "users": [
