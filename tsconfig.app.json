@@ -20,7 +20,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "types": ["jest", "node", "@testing-library/jest-dom"],
+    "esModuleInterop": true
   },
   "include": ["src"]
 }

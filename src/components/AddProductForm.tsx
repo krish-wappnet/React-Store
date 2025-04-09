@@ -133,6 +133,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onAdd }) => {
       doc.text("Product List", 20, 20);
       doc.setFontSize(12);
       let y = 30;
+      console.log("Products before export:", products);
       products.forEach((p) => {
         const text = `${p.id} | ${p.name} | ${p.category} | ₹${p.price.toFixed(2)} | Stock: ${p.stock} | ${p.description} | ${p.url || "No URL"} | Updated: ${p.updatedAt || "N/A"}`;
         doc.text(text, 20, y, { maxWidth: 170 });

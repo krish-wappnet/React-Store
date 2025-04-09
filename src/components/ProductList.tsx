@@ -31,6 +31,7 @@ const ProductList = () => {
     try {
       const response = await axios.get("/api/products");
       const fetchedProducts: Product[] = response.data;
+      console.log("Fetched response:", response.data);
       setProducts(fetchedProducts);
       fetchedProducts.forEach((product) => {
         if (product.stock < 10) {
