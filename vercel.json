@@ -4,19 +4,14 @@
       {
         "src": "package.json",
         "use": "@vercel/static-build"
-      },
-      {
-        "src": "api/index.ts",
-        "use": "@vercel/node"
       }
     ],
     "routes": [
       {
-        "src": "/api/(.*)",
-        "dest": "/api/index.ts"
+        "handle": "filesystem"
       },
       {
-        "src": "/(.*)",
+        "src": "/.*",
         "dest": "/index.html"
       }
     ]
