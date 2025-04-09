@@ -115,7 +115,7 @@ const AdminDashboard = () => {
                     fill="#8884d8"
                     label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                   >
-                    {stockDistribution.map((entry, index) => (
+                    {stockDistribution.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
