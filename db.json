@@ -1,0 +1,54 @@
+{
+  "products": [
+    {
+      "id": "ebac",
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 500000,
+      "stock": 60,
+      "description": "i9-15000K with 64GB ram",
+      "url": "https://res.cloudinary.com/dqthzpif0/image/upload/v1744000431/products/fmp4kdmiumtwtty256y7.jpg"
+    },
+    {
+      "id": "d30b",
+      "name": "Smartphone",
+      "category": "Electronics",
+      "price": 23000,
+      "stock": 15,
+      "description": "Android 15 with 12GB ram and 256 GB rom",
+      "url": "https://imgs.search.brave.com/4lHszV1NFSoNKKXm2rHqwIJVuuS3mhpn7Nc-VSHNqaQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTE5/MDIyNzY5NS9waG90/by9pcGhvbmUtMTEt/cHJvLW1heC1zaWx2/ZXItc21hcnRwaG9u/ZS5qcGc_cz02MTJ4/NjEyJnc9MCZrPTIw/JmM9Y05nUHYzU0RS/Xy1LOWRVOXdsMVFN/RndqbFZmWUE3bzli/Y1NGRzRJNVBjOD0"
+    },
+    {
+      "id": "52d4",
+      "name": "Tshirt",
+      "category": "Clothing",
+      "price": 850,
+      "stock": 60,
+      "description": "Cotton Tshirt 300gm",
+      "url": "https://imgs.search.brave.com/G0QMXu6i3K8FC5ITPPT7vcfnFj0lom_JpQoS2I7tBhQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLmV0/c3lzdGF0aWMuY29t/LzI0OTU2NzAzL2Mv/NTA0LzUwNC82Ni8z/NTUvaWwvNDhmMDM2/LzMwMzg4OTI0Nzcv/aWxfNjAweDYwMC4z/MDM4ODkyNDc3X3Rq/NHIuanBn"
+    },
+    {
+      "id": "f2ff",
+      "name": "Test",
+      "category": "Books",
+      "price": 500,
+      "stock": 10,
+      "description": "THis is the product",
+      "url": ""
+    }
+  ],
+  "users": [
+    {
+      "id": "1",
+      "username": "admin",
+      "role": "admin",
+      "password": "admin123"
+    },
+    {
+      "id": "2",
+      "username": "user",
+      "role": "user",
+      "password": "user123"
+    }
+  ]
+}
