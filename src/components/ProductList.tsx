@@ -29,7 +29,7 @@ const ProductList = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/products");
+      const response = await axios.get("/api/products");
       const fetchedProducts: Product[] = response.data;
       setProducts(fetchedProducts);
       fetchedProducts.forEach((product) => {
@@ -51,7 +51,7 @@ const ProductList = () => {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:3001/products", product);
+      const response = await axios.post("/api/products", product);
       setProducts([...products, response.data]);
       toast.success(`Product "${product.name}" added successfully!`);
       setIsAddFormOpen(false); // Close form after adding
@@ -74,7 +74,7 @@ const ProductList = () => {
     }
     try {
       const response = await axios.put(
-        `http://localhost:3001/products/${updatedProduct.id}`,
+        `/api/products/${updatedProduct.id}`,
         updatedProduct
       );
       setProducts(products.map((p) => (p.id === updatedProduct.id ? response.data : p)));
@@ -94,7 +94,7 @@ const ProductList = () => {
   const deleteProduct = async (id: string) => {
     try {
       const productToDelete = products.find((p) => p.id === id);
-      await axios.delete(`http://localhost:3001/products/${id}`);
+      await axios.delete(`/api/products/${id}`);
       setProducts(products.filter((p) => p.id !== id));
       toast.success(`Product "${productToDelete?.name}" deleted successfully!`);
     } catch (error) {

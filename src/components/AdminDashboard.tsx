@@ -25,7 +25,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/products");
+        const response = await axios.get("/api/products");
         // Mock updatedAt if not present in your data
         const fetchedProducts = response.data.map((p: Product) => ({
           ...p,

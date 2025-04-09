@@ -28,7 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user]);
 
   const login = async (username: string, password: string) => {
-    const response = await fetch("http://localhost:3001/users");
+    const response = await fetch("/api/users");
     const users: (User & { password: string })[] = await response.json();
 
     const foundUser = users.find(
